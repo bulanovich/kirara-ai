@@ -11,7 +11,7 @@ from .type_system import TypeSystem
 
 def extract_block_param(param: Parameter, type_system: TypeSystem) -> BlockConfig:
     """
-    提取 Block 参数信息，包括类型字符串、标签、是否必需、描述和默认值。
+    Extract Block parameter information, including the type string, label, whether it is required, description, and default value.
     """
     param_type = param.annotation
     label = param.name
