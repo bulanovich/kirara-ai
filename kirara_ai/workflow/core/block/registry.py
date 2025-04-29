@@ -1,3 +1,4 @@
+
 import warnings
 from inspect import Parameter, signature
 from typing import Annotated, Dict, List, Optional, Tuple, Type, get_args, get_origin
@@ -11,7 +12,7 @@ from .type_system import TypeSystem
 
 def extract_block_param(param: Parameter, type_system: TypeSystem) -> BlockConfig:
     """
-    Extract Block parameter information, including the type string, label, whether it is required, description, and default value.
+    Extract Block parameter information, including type string, label, whether it is required, description, and default value.
     """
     param_type = param.annotation
     label = param.name
@@ -30,7 +31,7 @@ def extract_block_param(param: Parameter, type_system: TypeSystem) -> BlockConfi
                 has_options = metadata.options_provider is not None
                 options_provider = metadata.options_provider
 
-            # 递归调用 extract_block_param 处理实际类型
+            # Recursively call extract_block_param to process the actual type
             block_config = extract_block_param(
                 Parameter(
                     name=param.name,
@@ -64,7 +65,7 @@ def extract_block_param(param: Parameter, type_system: TypeSystem) -> BlockConfi
 
 
 class BlockRegistry:
-    """Block 注册表，用于管理所有已注册的 block"""
+    """Block registry for managing all registered blocks."""
 
     def __init__(self):
         self._blocks = {}
@@ -78,13 +79,13 @@ class BlockRegistry:
         block_class: Type[Block],
         localized_name: Optional[str] = None,
     ):
-        """注册一个 block
+        """Register a block.
 
         Args:
-            block_id: block 的唯一标识
-            group_id: 组标识（internal 为框架内置）
-            block_class: block 类
-            localized_name: 本地化名称
+            block_id: Unique identifier for the block.
+            group_id: Group identifier (internal for built-in framework blocks).
+            block_class: The block class.
+            localized_name: Localized name.
         """
         full_name = f"{group_id}:{block_id}"
         if full_name in self._blocks:
@@ -93,7 +94,7 @@ class BlockRegistry:
         block_class.id = block_id
         if localized_name:
             self._localized_names[full_name] = localized_name
-        # 注册 Input 和 Output 类型
+        # Register Input and Output types
         for _, input_info in getattr(block_class, "inputs", {}).items():
             type_name = self._type_system.get_type_name(input_info.data_type)
             self._type_system.register_type(type_name, input_info.data_type)
@@ -102,21 +103,20 @@ class BlockRegistry:
             self._type_system.register_type(type_name, output_info.data_type)
 
     def get(self, full_name: str) -> Optional[Type[Block]]:
-        """获取已注册的 block 类"""
+        """Get the registered block class."""
         return self._blocks.get(full_name)
 
     def get_localized_name(self, block_id: str) -> Optional[str]:
-        """获取本地化名称"""
+        """Get the localized name."""
         return self._localized_names.get(block_id, block_id)
 
     def clear(self):
-        """清空注册表"""
+        """Clear the registry."""
         self._blocks.clear()
         self._type_system = TypeSystem()
 
     def get_block_type_name(self, block_class: Type[Block]) -> str:
-        """获取 block 的类型名称，优先使用注册名称"""
-        # 遍历注册表查找匹配的 block 类
+        """Get the block type name, prioritizing the registered name."""
         for full_name, registered_class in self._blocks.items():
             if registered_class == block_class:
                 return full_name
@@ -128,26 +128,17 @@ class BlockRegistry:
         return f"!!{block_class.__module__}.{block_class.__name__}"
 
     def get_all_types(self) -> List[Type[Block]]:
-        """获取所有已注册的 block 类型"""
+        """Get all registered block types."""
         return list(self._blocks.values())
 
     def extract_block_info(
         self, block_type: Type[Block]
     ) -> Tuple[Dict[str, BlockInput], Dict[str, BlockOutput], Dict[str, BlockConfig]]:
-        """
-        从 Block 类型中提取输入、输出和配置信息，并使用 BlockInput, BlockOutput, BlockConfig 对象封装。
-
-        Args:
-            block_type: Block 的类型。
-
-        Returns:
-            包含输入、输出和配置信息的字典。
-        """
+        """Extract input, output, and configuration information from the Block type."""
         inputs = {}
         outputs = {}
         configs = {}
 
-        # 获取 Block 类的输入输出定义
         for name, input_info in getattr(block_type, "inputs", {}).items():
             type_name, _, _ = self._type_system.extract_type_info(input_info.data_type)
             self._type_system.register_type(type_name, input_info.data_type)
@@ -172,10 +163,8 @@ class BlockRegistry:
                 type=type_name,
             )
 
-        # 内置方法不属于参数（Block 的 __init__ 方法）
         builtin_params = self.get_builtin_params()
 
-        # 获取 __init__ 方法的参数作为配置
         sig = signature(block_type.__init__)
         for param in sig.parameters.values():
             if param.name == "self" or param.name in builtin_params:
@@ -187,14 +176,14 @@ class BlockRegistry:
         return inputs, outputs, configs
 
     def get_builtin_params(self) -> List[str]:
-        """获取内置参数"""
+        """Get built-in parameters."""
         sig = signature(Block.__init__)
         return [param.name for param in sig.parameters.values()]
 
     def get_type_compatibility_map(self) -> Dict[str, Dict[str, bool]]:
-        """获取所有类型的兼容性映射"""
+        """Get the compatibility map of all types."""
         return self._type_system.get_compatibility_map()
 
     def is_type_compatible(self, source_type: str, target_type: str) -> bool:
-        """检查源类型是否可以赋值给目标类型"""
+        """Check if the source type can be assigned to the target type."""
         return self._type_system.is_compatible(source_type, target_type)
