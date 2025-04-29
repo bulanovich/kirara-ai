@@ -17,61 +17,62 @@ from .system.help import GenerateHelp
 
 
 def register_system_blocks(registry: BlockRegistry):
-    """注册系统自带的 block"""
-    # 基础 blocks
-    registry.register("text_block", "internal", TextBlock, "基础：文本")
-    registry.register("text_concat_block", "internal", TextConcatBlock, "基础：拼接文本")
-    registry.register("text_replace_block", "internal", TextReplaceBlock, "基础：替换文本")
-    registry.register("text_extract_by_regex_block", "internal", TextExtractByRegexBlock, "基础：正则表达式提取文本")
-    registry.register("current_time_block", "internal", CurrentTimeBlock, "基础：当前时间")
+    """Register system built-in blocks."""
+    # Basic blocks
+    registry.register("text_block", "internal", TextBlock, "Basic: Text")
+    registry.register("text_concat_block", "internal", TextConcatBlock, "Basic: Concatenate Text")
+    registry.register("text_replace_block", "internal", TextReplaceBlock, "Basic: Replace Text")
+    registry.register("text_extract_by_regex_block", "internal", TextExtractByRegexBlock,
+                      "Basic: Extract Text by Regex")
+    registry.register("current_time_block", "internal", CurrentTimeBlock, "Basic: Current Time")
 
-    # IM 相关 blocks
-    registry.register("get_message", "internal", GetIMMessage, "IM: 获取最新消息")
-    registry.register("send_message", "internal", SendIMMessage, "IM: 发送消息")
+    # IM related blocks
+    registry.register("get_message", "internal", GetIMMessage, "IM: Get Latest Message")
+    registry.register("send_message", "internal", SendIMMessage, "IM: Send Message")
     registry.register(
-        "toggle_edit_state", "internal", ToggleEditState, "IM: 切换编辑状态"
+        "toggle_edit_state", "internal", ToggleEditState, "IM: Toggle Edit State"
     )
     registry.register(
-        "extract_chat_sender", "internal", ExtractChatSender, "IM: 提取消息发送者"
+        "extract_chat_sender", "internal", ExtractChatSender, "IM: Extract Message Sender"
     )
-    registry.register("append_im_message", "internal", AppendIMMessage, "IM: 补充消息")
-    registry.register("im_message_to_text", "internal", IMMessageToText, "IM: 消息转文本")
-    registry.register("text_to_im_message", "internal", TextToIMMessage, "文本: 文本转消息")
+    registry.register("append_im_message", "internal", AppendIMMessage, "IM: Append Message")
+    registry.register("im_message_to_text", "internal", IMMessageToText, "IM: Message to Text")
+    registry.register("text_to_im_message", "internal", TextToIMMessage, "Text: Text to Message")
 
-    # LLM 相关 blocks
-    registry.register("chat_memory_query", "internal", ChatMemoryQuery, "LLM: 查询记忆")
+    # LLM related blocks
+    registry.register("chat_memory_query", "internal", ChatMemoryQuery, "LLM: Query Memory")
     registry.register(
         "chat_message_constructor",
         "internal",
         ChatMessageConstructor,
-        "LLM: 构造对话记录",
+        "LLM: Construct Chat Record",
     )
-    registry.register("chat_completion", "internal", ChatCompletion, "LLM: 执行对话")
-    registry.register("chat_completion_with_tools", "internal", ChatCompletionWithTools, "LLM: 执行对话并调用工具")
+    registry.register("chat_completion", "internal", ChatCompletion, "LLM: Execute Chat")
+    registry.register("chat_completion_with_tools", "internal", ChatCompletionWithTools, "LLM: Execute Chat with Tools")
     registry.register(
         "chat_response_converter",
         "internal",
         ChatResponseConverter,
-        "LLM->IM: 转换消息",
+        "LLM->IM: Convert Message",
     )
-    registry.register("chat_memory_store", "internal", ChatMemoryStore, "LLM: 存储记忆")
-    registry.register("llm_response_to_text", "internal", LLMResponseToText, "LLM: 响应转文本")
+    registry.register("chat_memory_store", "internal", ChatMemoryStore, "LLM: Store Memory")
+    registry.register("llm_response_to_text", "internal", LLMResponseToText, "LLM: Response to Text")
 
-    # 画图相关 blocks
+    # Drawing related blocks
     registry.register(
         "simple_stable_diffusion_webui",
         "internal",
         SimpleStableDiffusionWebUI,
-        "画图: 简单 Stable Diffusion WebUI",
+        "Drawing: Simple Stable Diffusion WebUI",
     )
 
-    # 游戏相关 blocks
-    registry.register("dice_roll", "game", DiceRoll, "游戏: 掷骰子")
-    registry.register("gacha_simulator", "game", GachaSimulator, "游戏: 抽卡模拟")
+    # Game related blocks
+    registry.register("dice_roll", "game", DiceRoll, "Game: Dice Roll")
+    registry.register("gacha_simulator", "game", GachaSimulator, "Game: Gacha Simulator")
 
-    # 系统相关 blocks
-    registry.register("generate_help", "system", GenerateHelp, "系统: 生成帮助")
-    registry.register("clear_memory", "system", ClearMemory, "系统: 清空记忆")
-    
-    # MCP 相关 blocks
-    registry.register("mcp_tool_provider", "mcp", MCPToolProvider, "MCP: 提供工具")
+    # System related blocks
+    registry.register("generate_help", "system", GenerateHelp, "System: Generate Help")
+    registry.register("clear_memory", "system", ClearMemory, "System: Clear Memory")
+
+    # MCP related blocks
+    registry.register("mcp_tool_provider", "mcp", MCPToolProvider, "MCP: Provide Tool")
