@@ -11,7 +11,7 @@ from kirara_ai.workflow.core.block import Block, Input, ParamMeta
 class ToggleEditState(Block):
     name = "toggle_edit_state"
     inputs = {
-        "sender": Input("sender", "聊天对象", ChatSender, "要切换编辑状态的聊天对象")
+        "sender": Input("sender", "Chat Target", ChatSender, "Chat target whose edit state needs to be toggled")
     }
     outputs = {}
     container: DependencyContainer
@@ -19,7 +19,7 @@ class ToggleEditState(Block):
     def __init__(
         self,
         is_editing: Annotated[
-            bool, ParamMeta(label="是否编辑", description="是否切换到编辑状态")
+            bool, ParamMeta(label="Is Editing", description="Whether to switch to editing state")
         ],
     ):
         self.is_editing = is_editing

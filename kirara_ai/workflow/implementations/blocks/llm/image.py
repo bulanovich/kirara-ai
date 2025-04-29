@@ -11,10 +11,10 @@ from kirara_ai.workflow.core.block.input_output import Input, Output
 class SimpleStableDiffusionWebUI(Block):
     name = "simple_stable_diffusion_webui"
     inputs = {
-        "prompt": Input("prompt", "提示", str, "提示"),
-        "negative_prompt": Input("negative_prompt", "负面提示", str, "负面提示"),
+        "prompt": Input("prompt", "Prompt", str, "Prompt"),
+        "negative_prompt": Input("negative_prompt", "Negative Prompt", str, "Negative Prompt"),
     }
-    outputs = {"image": Output("image", "图片", ImageMessage, "生成的图片")}
+    outputs = {"image": Output("image", "Image", ImageMessage, "Generated Image")}
 
     def __init__(
         self,
@@ -55,13 +55,13 @@ class SimpleStableDiffusionWebUI(Block):
         if response.status_code == 200:
             r = response.json()
             # Assuming the API returns the image in base64 format
-            # and it's the first image in the list
+            # and it is the first image in the list
             if "images" in r and r["images"]:
                 image_base64 = r["images"][0]
                 image_bytes = base64.b64decode(image_base64)
                 image_message = ImageMessage(
                     data=image_bytes, format="png"
-                )  # 假设是 PNG 格式
+                )  # Assuming it is PNG format
                 return {"image": image_message}
             else:
                 raise Exception("No image data found in the response")

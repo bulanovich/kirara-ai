@@ -11,10 +11,10 @@ T = TypeVar("T")
 class SetVariableBlock(Block):
     def __init__(self, container: DependencyContainer):
         inputs: Dict[str, Input] = {
-            "name": Input("name", "变量名", str, "变量名"),
-            "value": Input("value", "变量值", Any, "变量值"), # type: ignore
+            "name": Input("name", "Variable Name", str, "Variable Name"),
+            "value": Input("value", "Variable Value", Any, "Variable Value"),  # type: ignore
         }
-        outputs: Dict[str, Output] = {}  # 这个 block 不需要输出
+        outputs: Dict[str, Output] = {}  # This block does not require outputs
         super().__init__("set_variable", inputs, outputs)
         self.container = container
 
@@ -27,10 +27,10 @@ class SetVariableBlock(Block):
 class GetVariableBlock(Block):
     def __init__(self, container: DependencyContainer, var_type: Type[T]):
         inputs = {
-            "name": Input("name", "变量名", str, "变量名"),
-            "default": Input("default", "默认值", var_type, "默认值", nullable=True),
+            "name": Input("name", "Variable Name", str, "Variable Name"),
+            "default": Input("default", "Default Value", var_type, "Default Value", nullable=True),
         }
-        outputs = {"value": Output("value", "变量值", var_type, "变量值")}
+        outputs = {"value": Output("value", "Variable Value", var_type, "Variable Value")}
         super().__init__("get_variable", inputs, outputs)
         self.container = container
         self.var_type = var_type
@@ -39,10 +39,10 @@ class GetVariableBlock(Block):
         executor = self.container.resolve(WorkflowExecutor)
         value = executor.get_variable(name, default)
 
-        # 类型检查
+        # Type checking
         if value is not None and not isinstance(value, self.var_type):
             raise TypeError(
                 f"Variable '{name}' must be of type {self.var_type}, got {type(value)}"
             )
 
-        return {"value": value} # type: ignore
+        return {"value": value}  # type: ignore

@@ -8,12 +8,12 @@ from kirara_ai.workflow.core.block.input_output import Input, Output
 
 
 class ExtractChatSender(Block):
-    """提取消息发送者"""
+    """Extract the sender of a message."""
 
     name = "extract_chat_sender"
     container: DependencyContainer
-    inputs = {"msg": Input("msg", "IM 消息", IMMessage, "IM 消息")}
-    outputs = {"sender": Output("sender", "消息发送者", ChatSender, "消息发送者")}
+    inputs = {"msg": Input("msg", "IM Message", IMMessage, "IM Message")}
+    outputs = {"sender": Output("sender", "Message Sender", ChatSender, "Message Sender")}
 
     def execute(self, **kwargs) -> Dict[str, Any]:
         msg = self.container.resolve(IMMessage)

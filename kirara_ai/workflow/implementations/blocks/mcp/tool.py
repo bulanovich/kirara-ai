@@ -22,44 +22,44 @@ def get_enabled_mcp_tools(container: DependencyContainer, block: Block) -> List[
 
 class MCPToolProvider(Block):
     """
-    提供MCP工具调用工具
-
+    Provides MCP tool invocation capabilities
     """
+
     name = "mcp_tool_provider"
     outputs = {
-        "tools": Output("tools", "工具列表", List[Tool], "工具列表")
+        "tools": Output("tools", "Tool List", List[Tool], "Tool List")
     }
     container: DependencyContainer
 
-    def __init__(self, enabled_tools: Annotated[List[str], ParamMeta(label="启用工具列表", description="启用工具列表", options_provider=get_enabled_mcp_tools)]):
+    def __init__(self, enabled_tools: Annotated[List[str], ParamMeta(label="Enabled Tool List", description="List of enabled tools", options_provider=get_enabled_mcp_tools)]):
         self.logger = get_logger("MCPCallTool")
         self.enabled_tools = enabled_tools
 
     async def _call_tool(self, tool_call: ToolCall) -> LLMToolResultContent:
-        """提供MCP工具调用执行回调"""
+        """Provides execution callback for MCP tool invocation."""
         mcp_manager = self.container.resolve(MCPServerManager)
 
         server_info = mcp_manager.get_tool_server(tool_call.function.name)
         if not server_info:
-            raise ValueError(f"找不到工具: {tool_call.function.name}")
+            raise ValueError(f"Tool not found: {tool_call.function.name}")
         server, original_name = server_info
-        
+
         result = await server.call_tool(original_name, tool_call.function.arguments)
-        
+
         tool_result = await self._create_tool_result(
             tool_call.id, tool_call.function.name, result.content
         )
 
         tool_result.isError = result.isError
-        self.logger.info(f"工具调用结果: {tool_result}")
+        self.logger.info(f"Tool call result: {tool_result}")
         return tool_result
 
     def execute(self) -> Dict[str, Any]:
         """
-        提供MCP工具列表
+        Provides the list of MCP tools.
 
         Returns:
-            包含工具列表的字典
+            Dictionary containing the list of tools.
         """
         mcp_manager = self.container.resolve(MCPServerManager)
         mcp_tools = mcp_manager.get_tools()
@@ -79,7 +79,7 @@ class MCPToolProvider(Block):
         }
 
     async def _create_tool_result(self, tool_id: str, tool_name: str, content: list[types.TextContent | types.ImageContent | types.EmbeddedResource]) -> LLMToolResultContent:
-        """创建工具调用结果"""
+        """Creates the result of a tool invocation."""
         converted_content: List[tool.TextContent | tool.MediaContent] = []
         for item in content:
             if isinstance(item, types.TextContent):

@@ -23,11 +23,11 @@ class ChatMemoryQuery(Block):
     name = "chat_memory_query"
     inputs = {
         "chat_sender": Input(
-            "chat_sender", "聊天对象", ChatSender, "要查询记忆的聊天对象"
+            "chat_sender", "Chat Sender", ChatSender, "The chat sender whose memory is to be queried"
         )
     }
     outputs = {"memory_content": Output(
-        "memory_content", "记忆内容", List[ComposableMessageType], "记忆内容")}
+        "memory_content", "Memory Content", List[ComposableMessageType], "Memory Content")}
     container: DependencyContainer
 
     def __init__(
@@ -35,16 +35,16 @@ class ChatMemoryQuery(Block):
         scope_type: Annotated[
             Optional[str],
             ParamMeta(
-                label="级别",
-                description="要查询记忆的级别",
+                label="Scope Type",
+                description="Scope of the memory to query",
                 options_provider=scope_type_options_provider,
             ),
         ],
         decomposer_name: Annotated[
             Optional[str],
             ParamMeta(
-                label="解析器名称",
-                description="要使用的解析器名称",
+                label="Decomposer Name",
+                description="Name of the decomposer to use",
                 options_provider=decomposer_name_options_provider,
             ),
         ] = "default",
@@ -55,15 +55,15 @@ class ChatMemoryQuery(Block):
     def execute(self, chat_sender: ChatSender) -> Dict[str, Any]:
         self.memory_manager = self.container.resolve(MemoryManager)
 
-        # 如果没有指定作用域类型，使用配置中的默认值
+        # Use default scope if not specified
         if self.scope_type is None:
             self.scope_type = self.memory_manager.config.default_scope
 
-        # 获取作用域实例
+        # Get scope instance
         scope_registry = self.container.resolve(ScopeRegistry)
         self.scope = scope_registry.get_scope(self.scope_type)
 
-        # 获取解析器实例
+        # Get decomposer instance
         decomposer_registry = self.container.resolve(DecomposerRegistry)
         self.decomposer = decomposer_registry.get_decomposer(
             self.decomposer_name)
@@ -77,12 +77,13 @@ class ChatMemoryStore(Block):
     name = "chat_memory_store"
 
     inputs = {
-        "user_msg": Input("user_msg", "用户消息", IMMessage, "用户消息", nullable=True),
+        "user_msg": Input("user_msg", "User Message", IMMessage, "User Message", nullable=True),
         "llm_resp": Input(
-            "llm_resp", "LLM 回复", LLMChatResponse, "LLM 回复", nullable=True
+            "llm_resp", "LLM Response", LLMChatResponse, "LLM Response", nullable=True
         ),
         "middle_steps": Input(
-            "middle_steps", "中间步骤消息", List[ComposableMessageType], "中间步骤消息", nullable=True
+            "middle_steps", "Intermediate Step Messages", List[ComposableMessageType], "Intermediate Step Messages",
+            nullable=True
         )
     }
     outputs = {}
@@ -93,8 +94,8 @@ class ChatMemoryStore(Block):
         scope_type: Annotated[
             Optional[str],
             ParamMeta(
-                label="级别",
-                description="要查询记忆的级别",
+                label="Scope Type",
+                description="Scope of the memory to store",
                 options_provider=scope_type_options_provider,
             ),
         ],
@@ -110,33 +111,35 @@ class ChatMemoryStore(Block):
     ) -> Dict[str, Any]:
         self.memory_manager = self.container.resolve(MemoryManager)
 
-        # 如果没有指定作用域类型，使用配置中的默认值
+        # Use default scope if not specified
         if self.scope_type is None:
             self.scope_type = self.memory_manager.config.default_scope
 
-        # 获取作用域实例
+        # Get scope instance
         scope_registry = self.container.resolve(ScopeRegistry)
         self.scope = scope_registry.get_scope(self.scope_type)
 
-        # 获取组合器实例
+        # Get composer instance
         composer_registry = self.container.resolve(ComposerRegistry)
         self.composer = composer_registry.get_composer("default")
 
-        # 存储用户消息和LLM响应
+        # Store user messages and LLM responses
         if user_msg is None:
             composed_messages: List[ComposableMessageType] = []
         else:
             composed_messages = [user_msg]
-            
+
         if middle_steps is not None:
             composed_messages.extend(middle_steps)
 
         if llm_resp is not None:
             if llm_resp.message:
                 composed_messages.append(llm_resp.message)
+
         if not composed_messages:
             self.logger.warning("No messages to store")
             return {}
+
         self.logger.debug(f"Composed messages: {composed_messages}")
         memory_entries = self.composer.compose(
             user_msg.sender if user_msg else None, composed_messages)

@@ -8,18 +8,18 @@ from kirara_ai.workflow.core.block.input_output import Input, Output
 
 
 class GachaSimulator(Block):
-    """抽卡模拟器 block"""
+    """Gacha Simulator Block"""
 
     name = "gacha_simulator"
     inputs = {
-        "message": Input("message", "输入消息", IMMessage, "输入消息包含抽卡命令")
+        "message": Input("message", "Input Message", IMMessage, "Input message containing gacha command")
     }
     outputs = {
-        "response": Output("response", "响应消息", IMMessage, "响应消息包含抽卡结果")
+        "response": Output("response", "Response Message", IMMessage, "Response message containing gacha results")
     }
 
     def __init__(self, rates: Optional[Dict[str, float]] = None):
-        # 默认抽卡概率
+        # Default gacha rates
         self.rates = rates or {"SSR": 0.03, "SR": 0.12, "R": 0.85}  # 3%  # 12%  # 85%
 
     def _single_pull(self) -> str:
@@ -29,21 +29,21 @@ class GachaSimulator(Block):
             cumulative += rate
             if rand <= cumulative:
                 return rarity
-        return list(self.rates.keys())[-1]  # 保底
+        return list(self.rates.keys())[-1]  # Guaranteed minimum
 
     def execute(self, message: IMMessage) -> Dict[str, IMMessage]:
-        # 解析命令
+        # Parse command
         command = message.content
         is_ten_pull = "十连" in command
         pulls = 10 if is_ten_pull else 1
 
-        # 抽卡
+        # Perform gacha pulls
         results = [self._single_pull() for _ in range(pulls)]
 
-        # 生成结果统计
+        # Generate results statistics
         stats = {rarity: results.count(rarity) for rarity in self.rates.keys()}
 
-        # 生成详细信息
+        # Generate detailed results
         details = []
         for rarity in results:
             if rarity == "SSR":
@@ -53,8 +53,8 @@ class GachaSimulator(Block):
             else:
                 details.append("⭐ R")
 
-        result_text = f"抽卡结果: {'、'.join(details)}"
-        stats_text = "统计:\n" + "\n".join(
+        result_text = f"Gacha Results: {'、'.join(details)}"
+        stats_text = "Statistics:\n" + "\n".join(
             f"{rarity}: {count}" for rarity, count in stats.items()
         )
 

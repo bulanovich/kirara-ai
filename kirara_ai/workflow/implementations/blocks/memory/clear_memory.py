@@ -9,19 +9,19 @@ from kirara_ai.workflow.core.block import Block, Input, Output, ParamMeta
 
 
 class ClearMemory(Block):
-    """Block for clearing conversation memory"""
+    """Block for clearing conversation memory."""
 
     name = "clear_memory"
     inputs = {
-        "chat_sender": Input("chat_sender", "消息发送者", ChatSender, "消息发送者")
+        "chat_sender": Input("chat_sender", "Message Sender", ChatSender, "Message Sender")
     }
-    outputs = {"response": Output("response", "响应", IMMessage, "响应")}
+    outputs = {"response": Output("response", "Response", IMMessage, "Response")}
     container: DependencyContainer
 
     def __init__(
         self,
         scope_type: Annotated[
-            str, ParamMeta(label="级别", description="要清空记忆的级别")
+            str, ParamMeta(label="Scope Type", description="Scope to clear memory from")
         ] = "member",
     ):
         self.scope_type = scope_type
@@ -32,11 +32,12 @@ class ClearMemory(Block):
         # Get scope instance
         scope_registry = self.container.resolve(ScopeRegistry)
         self.scope = scope_registry.get_scope(self.scope_type)
+
         # Clear memory using the manager's method
         self.memory_manager.clear_memory(self.scope, chat_sender)
         return {
             "response": IMMessage(
                 sender=chat_sender,
-                message_elements=[TextMessage("已清空当前对话的记忆。")],
+                message_elements=[TextMessage("The memory of the current conversation has been cleared.")],
             )
         }

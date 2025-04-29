@@ -8,10 +8,10 @@ from kirara_ai.workflow.core.block.input_output import Input
 
 class TextBlock(Block):
     name = "text_block"
-    outputs = {"text": Output("text", "文本", str, "文本")}
+    outputs = {"text": Output("text", "Text", str, "Text")}
 
     def __init__(
-        self, text: Annotated[str, ParamMeta(label="文本", description="要输出的文本")]
+        self, text: Annotated[str, ParamMeta(label="Text", description="Text to output")]
     ):
         self.text = text
 
@@ -19,30 +19,30 @@ class TextBlock(Block):
         return {"text": self.text}
 
 
-# 拼接文本
+# Concatenate text
 class TextConcatBlock(Block):
     name = "text_concat_block"
     inputs = {
-        "text1": Input("text1", "文本1", str, "文本1"),
-        "text2": Input("text2", "文本2", str, "文本2"),
+        "text1": Input("text1", "Text 1", str, "Text 1"),
+        "text2": Input("text2", "Text 2", str, "Text 2"),
     }
-    outputs = {"text": Output("text", "拼接后的文本", str, "拼接后的文本")}
+    outputs = {"text": Output("text", "Concatenated Text", str, "Concatenated Text")}
 
     def execute(self, text1: str, text2: str) -> Dict[str, Any]:
         return {"text": text1 + text2}
 
 
-# 替换输入文本中的某一块文字为变量
+# Replace a part of the input text with a variable
 class TextReplaceBlock(Block):
     name = "text_replace_block"
     inputs = {
-        "text": Input("text", "原始文本", str, "原始文本"),
-        "new_text": Input("new_text", "新文本", Any, "新文本"),  # type: ignore
+        "text": Input("text", "Original Text", str, "Original Text"),
+        "new_text": Input("new_text", "New Text", Any, "New Text"),  # type: ignore
     }
-    outputs = {"text": Output("text", "替换后的文本", str, "替换后的文本")}
+    outputs = {"text": Output("text", "Replaced Text", str, "Replaced Text")}
 
     def __init__(
-        self, variable: Annotated[str, ParamMeta(label="被替换的文本", description="被替换的文本")]
+        self, variable: Annotated[str, ParamMeta(label="Text to Replace", description="Text to be replaced")]
     ):
         self.variable = variable
 
@@ -52,31 +52,32 @@ class TextReplaceBlock(Block):
         }
 
 
-# 正则表达式提取
+# Extract text using regular expression
 class TextExtractByRegexBlock(Block):
     name = "text_extract_by_regex_block"
-    inputs = {"text": Input("text", "原始文本", str, "原始文本")}
-    outputs = {"text": Output("text", "提取后的文本", str, "提取后的文本")}
+    inputs = {"text": Input("text", "Original Text", str, "Original Text")}
+    outputs = {"text": Output("text", "Extracted Text", str, "Extracted Text")}
+
     def __init__(
-        self, regex: Annotated[str, ParamMeta(label="正则表达式", description="正则表达式")]
+        self, regex: Annotated[str, ParamMeta(label="Regex Pattern", description="Regex Pattern")]
     ):
         self.regex = regex
 
     def execute(self, text: str) -> Dict[str, Any]:
-        # 使用正则表达式提取文本
+        # Extract text using regex
         regex = re.compile(self.regex)
         match = regex.search(text)
-        # 如果匹配到，则返回匹配到的文本，否则返回空字符串
+        # Return the matched group if exists, otherwise return an empty string
         if match and len(match.groups()) > 0:
             return {"text": match.group(1)}
         else:
             return {"text": ""}
 
 
-# 获取当前时间
+# Get current time
 class CurrentTimeBlock(Block):
     name = "current_time_block"
-    outputs = {"time": Output("time", "当前时间", str, "当前时间")}
+    outputs = {"time": Output("time", "Current Time", str, "Current Time")}
 
     def execute(self) -> Dict[str, Any]:
         return {"time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}

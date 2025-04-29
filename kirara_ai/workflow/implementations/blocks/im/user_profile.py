@@ -13,30 +13,30 @@ class QueryUserProfileBlock(Block):
     def __init__(self, container: DependencyContainer):
         inputs = {
             "chat_sender": Input(
-                "chat_sender", "聊天对象", ChatSender, "要查询聊天对象的 profile"
+                "chat_sender", "Chat Target", ChatSender, "The chat target whose profile is to be queried"
             ),
             "im_adapter": Input(
-                "im_adapter", "IM 平台", IMAdapter, "IM 平台适配器", nullable=True
+                "im_adapter", "IM Platform", IMAdapter, "IM Platform Adapter", nullable=True
             ),
         }
-        outputs = {"profile": Output("profile", "用户资料", UserProfile, "用户资料")}
+        outputs = {"profile": Output("profile", "User Profile", UserProfile, "User Profile")}
         super().__init__("query_user_profile", inputs, outputs)
         self.container = container
 
     def execute(
         self, chat_sender: ChatSender, im_adapter: Optional[IMAdapter] = None
     ) -> Dict[str, Any]:
-        # 如果没有提供 im_adapter，则从容器中获取默认的
+        # If no im_adapter is provided, retrieve the default one from the container
         if im_adapter is None:
             im_adapter = self.container.resolve(IMAdapter)
 
-        # 检查 im_adapter 是否实现了 UserProfileAdapter 协议
+        # Check if the im_adapter implements the UserProfileAdapter protocol
         if not isinstance(im_adapter, UserProfileAdapter):
             raise TypeError(
                 f"IM Adapter {type(im_adapter)} does not support user profile querying"
             )
 
-        # 同步调用异步方法（在工作流执行器中会被正确处理）
+        # Synchronously call the asynchronous method (handled correctly in the workflow executor)
         profile = asyncio.run(im_adapter.query_user_profile(chat_sender))  # type: ignore
 
         return {"profile": profile}
